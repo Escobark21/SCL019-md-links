@@ -29,22 +29,36 @@ const readFile = (resp) => fs.readFile(resp, 'utf-8', (err, data) => {
       const Regular = /(https?:\/\/)(www\.)?[-a-z0-9@:%._\+~#=]{1,256}\.[a-z0-9()]{1,6}\b([-a-z0-9()!@:%_\+.~#?&\/\/=]*)/gi
       const  url = data.match(Regular);
       console.log(colors.magenta(url));
+     
       // aca se le dice en caso de... la promesa haga esto
       const promesa = validatLink(url[0]);
-      promesa.then((linkstatus)=>{
+      promesa.then((linkstatus) => {
           console.log(linkstatus)
       })
-      console.log(promesa)
+      //console.log(promesa)
       return url;
     }
+    
   });
+  //const contador=(arr) =>{
+    //const contar= arr.length ;
+    //return console.log(contar) 
+    //}
+   // const contador = (array) => { 
+     //   const totalUrls = array.length;  
+       //   const stats = `Total Links: ${totalUrls}\n`; 
+        //return stats;
+      //}
+    
+
+
   // conocer el status del link por medio de la promesa
   function validatLink(link) {
     return new Promise((resolve) => {
       const options = {
         method: 'HEAD',
         host: url.parse(link).host,
-        port: 80,
+        port: 443,
         path: url.parse(link).pathname,
       };
   
@@ -81,6 +95,8 @@ module.exports.xtension=xtension;
 module.exports.directory=directory;
 module.exports.readFile=readFile;
 module.exports.validatLink=validatLink;
+//module.exports.stats=stats;
+//module.exports.contador=contador;
 
 
 
