@@ -1,53 +1,69 @@
 const fun = require('./fun.js');
+const { exit } = require('process');
+const readline = require('readline');
+const colors= require('colors');
 
+const mdLink = (path, option) => {
+  //console.log();
+  return new Promise(() => {
+     let arrayMD = [];
+    
+    const interfazCaptura = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
 
-const mdLink = (path, options) => {
-  console.log();
-  return new Promise((resolve) => {
-    let arrayMD = [];
-    if (path !== undefined) {
-      fun.existPath(path).then(() => {
-        const answer = !fun.pathAbsolute(path) ? fun.pathTranfAbsolute(path) : path;
-        return answer;
-      })
-        .then((answer1) => {
-          if (!fun.isFile(answer1)) throw new Error('No puede ingresar una carpeta');
-          if (fun.xtension(answer1)) {
-            arrayMD = functions.read(answer1);
+    interfazCaptura.question(colors.rainbow('Ingrese la ruta '),
+      function (resp) {
+        console.log(colors.yellow(`La ruta ingresada es: ${resp}`));
+        const rutaexi = fun.fileExists(resp)
+        if (rutaexi == false) {
+          console.log(colors.bgRed("No existe la ruta"))
+          exit();
+        }
+        else {
+          console.log(colors.green("La ruta existe:", rutaexi));
+
+        }
+        const absoluta = fun.convertPath(resp)
+        console.log(colors.blue("La ruta absoluta es" + absoluta));
+
+        const archiD = fun.archivos(resp);
+
+        if (archiD.isFile()) {
+          console.log(colors.yellow("Es un archivo?"));
+          const xtension = fun.xtension(resp);
+          if (xtension == '.md') {
+            console.log(colors.america('Si un archivo .md'));
+            fun.readFile(resp);
+            //fun.validatLink(resp);
+            // console.log(validatLink)
           } else {
-            throw new Error('El archivo no tiene extensión .md');
+            console.log(colors.bgRed('No es un archivo .md'));
+            exit();
           }
-          return arrayMD;
-        }).then((arrayLink) => {
-          const promiseArr = arrayLink.map((url) => functions.verifityLink(url));
-          return Promise.all(promiseArr);
-        })
-        .then((arrayJson) => {
-          if (options.validate && options.stats) {
-            functions.stats(arrayJson);
-            functions.validate(arrayJson);
-          } else {
-            if (options.stats) {
-              functions.stats(arrayJson);
+        }
+        if (archiD.isDirectory()) {
+          const arrayMd = [];
+          console.log(colors.bgRed("Esto es un directorio"));
+          const directory = fun.directory(resp).forEach(files => {
+            const mdExtens = fun.xtension(files)
+            if (mdExtens == '.md') {
+              arrayMd.push(files);
             }
-            if (options.validate) {
-              functions.validate(arrayJson);
-            }
-          }
-          resolve(arrayJson);
-        })
-        .catch((err) => {
-          console.log(err);
-          if (err.code === 'ENOENT') {
-            console.log('Path no encontrada');
+          });
+          if (arrayMd == '') {
+            console.log(colors.blue('Este directorio no tiene archivos .md'));
+
+            //console.log(contar(arrayMd));
           } else {
-            console.log(err.message);
+            console.log(colors.rainbow('Tiene archivos con extension .md'));
+            console.log(arrayMd);
           }
-        });
-    } else {
-      console.log('no ingresó ruta');
-    }
-  });
+
+          interfazCaptura.close();
+        };
+    });
+  })
 };
-
 module.exports = { mdLink };

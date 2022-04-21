@@ -1,67 +1,30 @@
-const fun = require('./fun.js');
-const path = require('path');
-const fs = require('fs');
-const colors = require('colors');
+//const fun = require('./fun.js');
+//const path = require('path');
+//const fs = require('fs');
+//const colors = require('colors');
 
+const { mdLink } = require('./md-links.js');
 
+const resp = process.argv;
 
-//const contar = fun.contador();
-const readline = require('readline');
-const { exit } = require('process');
-const interfazCaptura = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
+const option = {};
+let ruta = '';
+
+if (resp.some((x) => x === '--validate')) {
+  option.validate = true;
+}
+if (resp.some((x) => x === '--stats')) {
+  option.stats = true;
+}
+//const path = resp[0] === 'mdLink' ? resp[1] : resp[2];
+if (resp[0] === 'mdLink'){
+  ruta = resp [1];
+}else{
+  ruta = resp[2];
+}
+
+mdLink(ruta, option).then(() => {
+  console.log();
+}).catch((err) => {
+  console.log(err);
 });
-
-interfazCaptura.question(colors.rainbow('Ingrese la ruta '), function (resp) {
-  console.log(colors.yellow(`La ruta ingresada es: ${resp}`));
-  const rutaexi = fun.fileExists(resp)
-  if (rutaexi == false) {
-    console.log(colors.bgRed("No existe la ruta"))
-    exit();
-  }
-  else {
-    console.log(colors.green("La ruta existe:", rutaexi));
-
-  }
-  const absoluta = fun.convertPath(resp)
-  console.log(colors.blue("La ruta absoluta es" + absoluta));
-
-  const archiD = fun.archivos(resp);
-
-  if (archiD.isFile()) {
-    console.log(colors.yellow("Es un archivo"));
-    const xtension = fun.xtension(resp);
-    if (xtension == '.md') {
-      console.log(colors.america('Es un archivo .md'));
-      fun.readFile(resp);
-      //fun.validatLink(valLinks[0]);
-      // console.log(valLinks)
-    } else {
-      console.log(colors.bgRed('No es un archivo .md'));
-      exit();
-    }
-  }
-  if (archiD.isDirectory()) {
-    const arrayMd = [];
-    console.log(colors.bgRed("Esto es un directorio"));
-    const directory = fun.directory(resp).forEach(files => {
-      const mdExtens = fun.xtension(files)
-      if (mdExtens == '.md') {
-        arrayMd.push(files);
-      }
-    });
-    if (arrayMd == '') {
-      console.log(colors.blue('Este directorio no tiene archivos .md'));
-
-      //console.log(contar(arrayMd));
-    } else {
-      console.log(colors.rainbow('Tiene archivos con extension .md'));
-      console.log(arrayMd);
-    }
-
-    interfazCaptura.close();
-  };
-})
-
-
